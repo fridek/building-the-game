@@ -136,19 +136,31 @@ define(function() {
             return texture;
         },
     
-        loadTexture: function(gl, src, callback) {
+        loadTexture: function(gl, image, callback) {
             var texture = gl.createTexture();
-            var image = new Image();
-            image.addEventListener("load", function() {
+
+            var imageXhr = new XMLHttpRequest();
+            imageXhr.open("GET", image.src, true);
+            imageXhr.responseType = "arraybuffer";
+            imageXhr.onload = function() {
+                var tmp;
+                var data = new Uint8Array(this.response);
+                for(var i = 0; i<=this.response.byteLength; i+=3) {
+                  tmp = data[i+2];
+                  data[i+2] = data[i];
+                  data[i] = tmp;
+                }
+
                 gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, image.width, image.height, 0, gl.RGB, gl.UNSIGNED_BYTE, data);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
                 gl.generateMipmap(gl.TEXTURE_2D);
             
                 if(callback) { callback(texture); }
-            });
-            image.src = src;
+            };
+            imageXhr.send(null);
+
             return texture;
         },
     

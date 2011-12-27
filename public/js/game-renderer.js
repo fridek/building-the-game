@@ -69,7 +69,11 @@ define([
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
         this._buildCube(gl);
-        this.cubeTexture = glUtil.loadTexture(gl, "root/texture/crate.png");
+        this.cubeTexture = glUtil.loadTexture(gl, {
+          src: "root/texture/crate.tga",
+          width: 256,
+          height: 256
+        });
         this.cubeShader = glUtil.createShaderProgram(gl, cubeVS, cubeFS, 
             ["position", "texture"],
             ["viewMat", "projectionMat", "diffuse"]
@@ -100,6 +104,7 @@ define([
         
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.cubeTexture);
+
         gl.uniform1i(shader.uniform.diffuse, 0);
 
         gl.enableVertexAttribArray(shader.attribute.position);
